@@ -10,7 +10,7 @@ opencode is an AI coding agent. Use it to delegate coding tasks or get a second-
 ## Preflight checks
 
 ```bash
-[ -x "$(which opencode)" ] || { echo "opencode not found"; exit 1; }
+command -v opencode >/dev/null 2>&1 || { echo "opencode not found"; exit 1; }
 
 # For write tasks — warn on dirty git state (don't block)
 git -C /path/to/project status --porcelain 2>/dev/null | grep -q . && \
@@ -33,15 +33,20 @@ There is no technical enforcement of read-only behavior — user confirmation is
 ### Run (non-interactive) — well-defined tasks
 
 ```bash
+PROMPT="your prompt here"
 OUTPUT=$(mktemp /tmp/opencode_XXXXXX)
 echo "OUTPUT: $OUTPUT"
-opencode run "your prompt here" \
+opencode run "$PROMPT" \
   --dir /path/to/project \
   --model opencode-go/minimax-m2.7 \
   --title "task-slug" \
   > "$OUTPUT" 2>&1
 EXIT_CODE=$?
-[ -s "$OUTPUT" ] && grep -A 50 "## Done" "$OUTPUT" || echo "(no output)"
+if [ -s "$OUTPUT" ]; then
+  sed -n '/## Done/,$p' "$OUTPUT"
+else
+  echo "(no output)"
+fi
 exit $EXIT_CODE
 ```
 

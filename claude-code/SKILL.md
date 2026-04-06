@@ -17,7 +17,7 @@ Use `claude -p` to spawn a Claude Code sub-agent non-interactively. This gives y
 ## Preflight checks
 
 ```bash
-[ -x "$(which claude)" ] || { echo "Claude Code not found"; exit 1; }
+command -v claude >/dev/null 2>&1 || { echo "Claude Code not found"; exit 1; }
 
 # For write tasks — warn on dirty git state (don't block)
 git -C /path/to/project status --porcelain 2>/dev/null | grep -q . && \
@@ -53,15 +53,17 @@ OUTPUT=$(mktemp /tmp/claude_XXXXXX)
 echo "OUTPUT: $OUTPUT"
 printf '%s' "your prompt here" | claude -p \
   --permission-mode plan \
-  --model haiku \
-  --effort low \
   --output-format text \
   --no-session-persistence \
   --add-dir /path/to/project \
   --max-budget-usd 0.50 \
   > "$OUTPUT" 2>"${OUTPUT}.err"
 EXIT_CODE=$?
-[ -s "$OUTPUT" ] && grep -A 50 "## Done" "$OUTPUT" || cat "${OUTPUT}.err"
+if [ -s "$OUTPUT" ]; then
+  sed -n '/## Done/,$p' "$OUTPUT"
+else
+  echo "Run failed:"; cat "${OUTPUT}.err" 2>/dev/null
+fi
 exit $EXIT_CODE
 ```
 
@@ -94,7 +96,7 @@ This gives Claude a structured contract to fill — more reliable than hoping it
 | Hard reasoning | `sonnet` | `high` | Higher |
 | Critical tasks | `opus` | `high` | Expensive |
 
-Always use the cheapest model that can handle the task. The god-model (current session) handles orchestration — sub-agents handle execution.
+Omit `--model` to use the default. Override down to `haiku` for cheap tasks, up to `opus` for critical ones.
 
 ## Resume or fork a session
 

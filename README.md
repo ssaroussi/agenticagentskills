@@ -47,12 +47,14 @@ Each skill follows the same orchestration pattern:
 Copy the skill directories into your Claude skills folder:
 
 ```bash
+mkdir -p ~/.claude/skills
 cp -r codex gemini opencode claude-code ~/.claude/skills/
 ```
 
 Or symlink for live updates:
 
 ```bash
+mkdir -p ~/.claude/skills
 for skill in codex gemini opencode claude-code; do
   ln -s "$(pwd)/$skill" ~/.claude/skills/$skill
 done
@@ -75,8 +77,8 @@ Each skill handles permission confirmation, prompt construction, background exec
 
 | | Codex | Gemini | opencode | Claude Code |
 |---|---|---|---|---|
-| **Sandbox** | `read-only` / `workspace-write` / `danger-full-access` | `--approval-mode` + `-s/--sandbox` | None (user confirmation only) | `--permission-mode` |
-| **Prompt input** | stdin (`printf \| codex exec -`) | stdin (`printf \| gemini -p -`) | Positional args | stdin (`printf \| claude -p`) |
+| **Permissions** | `--sandbox`: `read-only` / `workspace-write` / `danger-full-access` | `--approval-mode` + `-s/--sandbox` | None (user confirmation only) | `--permission-mode`: `plan` / `acceptEdits` / `auto` |
+| **Prompt input** | stdin (`printf \| codex exec -`) | `-p "$PROMPT"` (string arg) | Positional args (`"$PROMPT"`) | stdin (`printf \| claude -p`) |
 | **Output capture** | `-o <file>` | stdout redirect | stdout redirect | stdout redirect |
 | **Session resume** | `codex resume --last` | `gemini --resume latest` | `opencode run --continue` | `claude --continue` |
 | **Worktree isolation** | — | `--worktree` | — | `--worktree` |

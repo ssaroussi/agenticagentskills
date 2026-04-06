@@ -44,7 +44,7 @@ The point of delegating is twofold: get a different thinking strategy, and offlo
 
 - **Don't inline file contents into prompts.** Give sub-agents absolute paths — let them read files themselves.
 - **Request structured, short output.** Use a canonical template (see below). Don't let sub-agents write essays Claude has to read in full.
-- **Extract structured sections, don't truncate blindly.** Use `grep -A 50 "## Done" "$OUTPUT"` rather than `head -50` — agents often emit reasoning before the structured section.
+- **Extract structured sections, don't truncate blindly.** Use `sed -n '/## Done/,$p' "$OUTPUT"` rather than `head -50` or `grep -A 50` — agents often emit reasoning before the structured section, and a fixed line count will truncate long responses.
 - **Separate stderr when using JSON output.** `> "$OUTPUT" 2>"${OUTPUT}.err"` keeps JSON clean; check the error file on failure.
 - **Pass only what the sub-agent needs.** Don't leak Claude's conversation history. Give the minimum: task, file paths, constraints, output format.
 - **Claude's role is orchestration.** Deciding what to run, confirming permissions, summarizing results. The sub-agent handles execution.
@@ -88,13 +88,13 @@ anything that needs attention, or "none"
 - **Summarize, don't relay.** Read the output and return a short report: what happened, what changed, anything to flag.
 - **Git diff as ground truth.** `git diff --stat` is more reliable than the agent's own description.
 - **Diff triage.** Check `git diff --shortstat` first. If >50 files or >500 lines, show file-list only.
-- **No git fallback.** Not all projects are git repos. Use `--skip-git-repo-check` (or equivalent) and rely on the output file.
+- **No git fallback.** Not all projects are git repos. Codex supports `--skip-git-repo-check`; for other agents, wrap the diff step with `git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git diff ...` so it silently skips when there's no repo.
 
 ---
 
 ## Temp File Management
 
-- **Unique output paths.** Use `mktemp /tmp/prefix_XXXXXX` — no suffix after the X's. On macOS, `mktemp /tmp/name_XXXXXX.md` creates a literal file without substitution.
+- **Unique output paths.** Use `mktemp /tmp/prefix_XXXXXX` — X's must be the last characters. On macOS, adding a suffix after the X's (e.g. `mktemp /tmp/name_XXXXXX.md`) creates a literal filename without substitution.
 - **Echo the path for background runs.** `echo "OUTPUT: $OUTPUT"` lets Claude parse the path from the task notification.
 - **Separate stderr for JSON.** Use `> "$OUTPUT" 2>"${OUTPUT}.err"`.
 - **Don't delete immediately.** Keep output files for the session in case of follow-up questions.
@@ -104,6 +104,7 @@ anything that needs attention, or "none"
 ## Reliability
 
 - **Capture output regardless of exit code.** Don't use `&&` — use `; EXIT_CODE=$?` to always read the output even on failure.
+- **Avoid `[ -s "$OUTPUT" ] && cmd || fallback`.** If `cmd` fails (e.g. `sed` finds no match), the `||` branch fires incorrectly. Use `if/else` instead.
 - **Check exit codes.** Surface failures clearly rather than silently reading an empty file.
 - **Check for empty output.** `[ -s "$OUTPUT" ]` before reading.
 - **Auth failures.** Let the agent surface them — don't gate on a specific env var. Agents authenticate via env var, cached login, or config.

@@ -10,7 +10,7 @@ Gemini is Google's AI coding agent. Use it to delegate coding tasks or get a sec
 ## Preflight checks
 
 ```bash
-[ -x "$(which gemini)" ] || { echo "Gemini not found"; exit 1; }
+command -v gemini >/dev/null 2>&1 || { echo "Gemini not found"; exit 1; }
 
 # For write tasks — warn on dirty git state (don't block)
 git -C /path/to/project status --porcelain 2>/dev/null | grep -q . && \
@@ -44,14 +44,18 @@ Always tell the user the approval mode before running: "I'm going to run Gemini 
 Pipe the prompt via stdin to avoid shell injection:
 
 ```bash
+PROMPT="your prompt here"
 OUTPUT=$(mktemp /tmp/gemini_XXXXXX)
 echo "OUTPUT: $OUTPUT"
-printf '%s' "your prompt here" | gemini -p - \
+gemini -p "$PROMPT" \
   --approval-mode plan \
-  --output-format text \
-  > "$OUTPUT" 2>&1
+  > "$OUTPUT" 2>"${OUTPUT}.err"
 EXIT_CODE=$?
-[ -s "$OUTPUT" ] && grep -A 50 "## Done" "$OUTPUT" || echo "(no output)"
+if [ -s "$OUTPUT" ]; then
+  sed -n '/## Done/,$p' "$OUTPUT"
+else
+  echo "Run failed:"; cat "${OUTPUT}.err" 2>/dev/null
+fi
 exit $EXIT_CODE
 ```
 

@@ -13,7 +13,7 @@ Before any exec run:
 
 ```bash
 # 1. Verify installed
-[ -x "$(which codex)" ] || { echo "Codex not found"; exit 1; }
+command -v codex >/dev/null 2>&1 || { echo "Codex not found"; exit 1; }
 
 # 2. For write tasks — warn on dirty git state (don't block)
 git -C /path/to/project status --porcelain 2>/dev/null | grep -q . && \
@@ -45,19 +45,17 @@ printf '%s' "your prompt here" | codex exec - \
   -C /path/to/project \
   --sandbox workspace-write \
   -c model_reasoning_effort=medium \
-  -o "$OUTPUT" 2>&1
+  -o "$OUTPUT" 2>"${OUTPUT}.err"
 EXIT_CODE=$?
-[ -s "$OUTPUT" ] && grep -A 50 "## Done" "$OUTPUT" || echo "(no output)"
+if [ -s "$OUTPUT" ]; then
+  sed -n '/## Done/,$p' "$OUTPUT"
+else
+  echo "Run failed:"; cat "${OUTPUT}.err" 2>/dev/null
+fi
 exit $EXIT_CODE
 ```
 
 Run this with `run_in_background: true` so Claude isn't blocked. Parse `OUTPUT: /tmp/...` from the task notification to find the file when done.
-
-After a successful run, read only what you need — check the file size first:
-```bash
-wc -l "$OUTPUT"   # if large, read the first 50 lines only
-head -50 "$OUTPUT"
-```
 
 Summarize in 3-5 bullet points — don't relay verbatim. Then check git:
 ```bash
@@ -74,14 +72,18 @@ Pick one mode. `codex review` must run from the project directory — it doesn't
 ```bash
 OUTPUT=$(mktemp /tmp/codex_output_XXXXXX)
 echo "OUTPUT: $OUTPUT"
-cd /path/to/project
+cd /path/to/project || exit 1
 # Pick one:
-codex review --uncommitted > "$OUTPUT" 2>&1
-# codex review --base main > "$OUTPUT" 2>&1
-# codex review --commit <sha> > "$OUTPUT" 2>&1
-# codex review --uncommitted "focus on security" > "$OUTPUT" 2>&1
+codex review --uncommitted > "$OUTPUT" 2>"${OUTPUT}.err"
+# codex review --base main > "$OUTPUT" 2>"${OUTPUT}.err"
+# codex review --commit <sha> > "$OUTPUT" 2>"${OUTPUT}.err"
+# codex review --uncommitted "focus on security" > "$OUTPUT" 2>"${OUTPUT}.err"
 EXIT_CODE=$?
-[ -s "$OUTPUT" ] && head -80 "$OUTPUT" || echo "(no output)"
+if [ -s "$OUTPUT" ]; then
+  sed -n '/## Done/,$p' "$OUTPUT"
+else
+  echo "Run failed:"; cat "${OUTPUT}.err" 2>/dev/null
+fi
 exit $EXIT_CODE
 ```
 
@@ -109,7 +111,7 @@ codex --full-auto "your starting prompt"   # auto-approves more actions, use wit
 | Flag | Purpose |
 |------|---------|
 | `-C <dir>` | Working directory |
-| `-m <model>` | Override model (config default: `gpt-5.4`) |
+| `-m <model>` | Override model (e.g. `o4-mini`, `o3`; omit to use config default) |
 | `-c model_reasoning_effort=medium` | Faster runs for lighter tasks (default is `high`) |
 | `--sandbox <mode>` | `read-only`, `workspace-write`, `danger-full-access` |
 | `--full-auto` | Shorthand for `-a on-request --sandbox workspace-write` |
