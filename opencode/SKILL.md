@@ -49,7 +49,7 @@ fi
 exit $EXIT_CODE
 ```
 
-Omit `--model` to use the user's configured default. Add `--model <provider/model>` to override — ask the user if they have a preference, or suggest `opencode-go/minimax-m2.7` for a fast, cost-effective option.
+Omit `--model` to use the user's configured default. If the user mentions a model in their request (e.g. "use GLM", "run with minimax", "use anthropic/claude-sonnet-4-5"), pass it as `--model <provider/model>`. You can ask if unsure, but don't ask unnecessarily — if they said it, use it.
 
 Run with `run_in_background: true`. Parse `OUTPUT: /tmp/...` from the task notification.
 
