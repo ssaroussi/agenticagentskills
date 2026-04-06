@@ -38,7 +38,6 @@ OUTPUT=$(mktemp /tmp/opencode_XXXXXX)
 echo "OUTPUT: $OUTPUT"
 opencode run "$PROMPT" \
   --dir /path/to/project \
-  --model opencode-go/minimax-m2.7 \
   --title "task-slug" \
   > "$OUTPUT" 2>&1
 EXIT_CODE=$?
@@ -49,6 +48,8 @@ else
 fi
 exit $EXIT_CODE
 ```
+
+Omit `--model` to use the user's configured default. Add `--model <provider/model>` to override — ask the user if they have a preference, or suggest `opencode-go/minimax-m2.7` for a fast, cost-effective option.
 
 Run with `run_in_background: true`. Parse `OUTPUT: /tmp/...` from the task notification.
 
@@ -89,7 +90,7 @@ Use this when the task is naturally iterative — don't start a fresh session fo
 | Flag | Purpose |
 |------|---------|
 | `--dir <path>` | Working directory |
-| `-m, --model <provider/model>` | Model to use — default: `opencode-go/minimax-m2.7`, or user's choice |
+| `-m, --model <provider/model>` | Model to use — omit to use the user's configured default. Good options: `opencode-go/minimax-m2.7` (fast, cost-effective), or any provider/model the user has set up |
 | `--variant <level>` | Reasoning effort: `minimal`, `high`, `max` — use `minimal` for light tasks |
 | `--file <path>` | Attach file(s) to the prompt — use instead of inlining content |
 | `--format json` | Raw JSON events (useful for scripting) |
