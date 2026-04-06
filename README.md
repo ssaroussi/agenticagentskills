@@ -81,9 +81,9 @@ Each skill handles permission confirmation, prompt construction, background exec
 | **Prompt input** | stdin (`printf \| codex exec -`) | `-p "$PROMPT"` (string arg) | Positional args (`"$PROMPT"`) | stdin (`printf \| claude -p`) |
 | **Output capture** | `-o <file>` | stdout redirect | stdout redirect | stdout redirect |
 | **Session resume** | `codex resume --last` | `gemini --resume latest` | `opencode run --continue` | `claude --continue` |
-| **Worktree isolation** | — | `--worktree` | — | `--worktree` |
+| **Worktree isolation** | — | `-w/--worktree` | — | `-w/--worktree` |
 | **Structured output** | Prompt template | Prompt template | Prompt template | `--json-schema` (enforced) |
-| **Cost control** | `model_reasoning_effort` | — | `--variant` | `--max-budget-usd`, `--effort`, `--model` |
+| **Cost control** | `model_reasoning_effort` config | — | `--model` | `--max-budget-usd`, `--effort`, `--model` |
 
 ## Strategy
 
@@ -116,7 +116,7 @@ Orchestrating agents via CLI introduces attack surface that doesn't exist in sin
 These skills were designed iteratively by running all four agents against the same review prompts simultaneously and consolidating findings. A few things that came up:
 
 - **`reasoning_effort: high`** (Codex default) turns a 3-minute task into a 1-hour task. Always override to `medium` for orchestration use.
-- **`head -50` truncates the wrong part** — agents emit reasoning before structured output. Use `grep -A 50 "## Done"` instead.
+- **`head -50` truncates the wrong part** — agents emit reasoning before structured output. Use `sed -n '/## Done/,$p'` instead.
 - **`mktemp` on macOS** requires X's at the very end — `mktemp /tmp/name_XXXXXX.md` does not substitute the X's.
 - **`2>&1` corrupts JSON output** — separate stderr with `2>"${OUTPUT}.err"`.
 - **Gemini and opencode finished in seconds** for the same task Codex ran for an hour. Speed varies wildly across agents.

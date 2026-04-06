@@ -39,12 +39,12 @@ echo "OUTPUT: $OUTPUT"
 opencode run "$PROMPT" \
   --dir /path/to/project \
   --title "task-slug" \
-  > "$OUTPUT" 2>&1
+  > "$OUTPUT" 2>"${OUTPUT}.err"
 EXIT_CODE=$?
 if [ -s "$OUTPUT" ]; then
   sed -n '/## Done/,$p' "$OUTPUT"
 else
-  echo "(no output)"
+  echo "Run failed:"; cat "${OUTPUT}.err" 2>/dev/null
 fi
 exit $EXIT_CODE
 ```
@@ -130,5 +130,5 @@ Use this sparingly — the export can be large. Read only the final assistant me
 2. **Confirm permissions** — warn user there is no sandbox, get confirmation for write tasks
 3. **Craft a precise prompt** — short, scoped, structured output format, attach files with `--file`
 4. **Run in background** — `run_in_background: true`, print the output path
-5. **On completion** — check exit code, read first 50 lines, summarize, triage git diff
+5. **On completion** — check exit code, extract structured section with `sed -n '/## Done/,$p'`, summarize, triage git diff
 6. **Let the user decide** — don't commit or further modify opencode's changes without being asked

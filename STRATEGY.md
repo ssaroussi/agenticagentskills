@@ -109,7 +109,7 @@ anything that needs attention, or "none"
 - **Check for empty output.** `[ -s "$OUTPUT" ]` before reading.
 - **Auth failures.** Let the agent surface them — don't gate on a specific env var. Agents authenticate via env var, cached login, or config.
 - **Rate limits.** Sub-agents can hit 429s independently. Treat as transient — report and suggest retry.
-- **Binary check.** `[ -x "$(which agent)" ]` before running.
+- **Binary check.** `command -v agent >/dev/null 2>&1` before running. Avoid `which` — it's not portable across shells.
 
 ---
 

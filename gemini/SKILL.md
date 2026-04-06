@@ -41,7 +41,7 @@ Always tell the user the approval mode before running: "I'm going to run Gemini 
 
 ### Non-interactive — well-defined tasks
 
-Pipe the prompt via stdin to avoid shell injection:
+Pass the prompt as a quoted variable — Gemini takes it as a flag argument, not stdin:
 
 ```bash
 PROMPT="your prompt here"
@@ -128,5 +128,5 @@ gemini --resume latest    # resume last session
 2. **Choose approval mode** — `plan` by default, escalate with user confirmation
 3. **Craft a precise prompt** — short, scoped, structured output format, absolute paths
 4. **Run in background** — `run_in_background: true`, print the output path
-5. **On completion** — check exit code, read first 50 lines, summarize, triage git diff
+5. **On completion** — check exit code, extract structured section with `sed -n '/## Done/,$p'`, summarize, triage git diff
 6. **Let the user decide** — don't commit or further modify Gemini's changes without being asked
