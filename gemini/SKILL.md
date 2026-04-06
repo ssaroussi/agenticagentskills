@@ -1,11 +1,13 @@
 ---
 name: gemini
-description: Use this skill whenever the user wants to delegate a coding task to Gemini, run Gemini on their codebase, get a code review from Gemini, or mentions "gemini" in the context of coding tasks. Triggers on: "use gemini to...", "ask gemini to...", "run gemini on...", "let gemini handle this", "what does gemini think". Use this even if the user just says "gemini" without further detail.
+description: Use this skill whenever the user wants to delegate a coding task to Gemini, search the web, research a topic, or mentions "gemini". Triggers on: "use gemini to...", "ask gemini to...", "run gemini on...", "search for", "look up", "research", "what's the latest on", "find info about". Use this even if the user just says "gemini" without further detail.
 ---
 
 # Gemini CLI
 
 Gemini is Google's AI coding agent. Use it to delegate coding tasks or get a second-agent perspective on code.
+
+**For search and research tasks** (searching the web, looking something up, researching a topic), read `search/SKILL.md` for the specialized workflow instead of the general pattern below.
 
 ## Preflight checks
 

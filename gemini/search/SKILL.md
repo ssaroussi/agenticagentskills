@@ -10,8 +10,7 @@ allowed-tools: Bash
 
 Gemini has native Google Search — use it for any task needing current or external information.
 
-For the execution pattern (how to invoke Gemini CLI non-interactively, handle output, errors, permissions), read:
-`~/.claude/skills/gemini/SKILL.md`
+For the execution pattern (how to invoke Gemini CLI non-interactively, handle output, errors, permissions), refer to the parent `SKILL.md` in this same skill directory.
 
 Use `--approval-mode plan` (read-only).
 
