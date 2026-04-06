@@ -36,6 +36,8 @@ Claude Code has explicit permission modes — match to the task:
 
 **Default to `--permission-mode plan`** for any task that doesn't require writing. Always tell the user before escalating: "I'm going to run a Claude sub-agent with edit access. OK?"
 
+**Never exceed the parent session's own permissions** — as a principle. There is no technical enforcement between the parent Claude session's constraints and the sub-agent's permission mode. This is policy, not a guarantee.
+
 For write tasks, also restrict tools explicitly:
 ```bash
 --allowedTools "Read,Grep,Glob,Bash(git:*)"   # read-only example

@@ -35,6 +35,8 @@ These are two separate control planes — use both for write tasks:
 
 Always tell the user the approval mode before running: "I'm going to run Gemini in plan (read-only) mode. OK?"
 
+**Never exceed Claude's own permissions** — as a principle. There is no technical enforcement between Claude's runtime constraints and Gemini's approval mode. This is policy, not a guarantee.
+
 ## Choosing the right mode
 
 ### Non-interactive — well-defined tasks

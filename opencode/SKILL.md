@@ -26,6 +26,8 @@ git -C /path/to/project status --porcelain 2>/dev/null | grep -q . && \
 
 There is no technical enforcement of read-only behavior — user confirmation is the only gate. A cheaper model does not mean read-only; opencode can still write regardless of model choice.
 
+**Never exceed the orchestrating agent's own permissions** — as a principle. This is policy, not a guarantee.
+
 ## Choosing the right mode
 
 ### Run (non-interactive) — well-defined tasks
