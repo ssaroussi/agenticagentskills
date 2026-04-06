@@ -1,20 +1,8 @@
 # Agentic Agent Skills
 
-> Use one AI to orchestrate others.
-
-Most AI coding workflows hit the same wall: one agent, one context window, one thinking strategy. This repository breaks that constraint.
-
-These are skills (plugins) for **Claude Code**, **Codex**, **Gemini**, **opencode**, and any AI agent with a plugin system — that let your AI act as a **god-model**: an orchestrator that delegates coding tasks to other AI agents running in parallel, each in their own context window, with their own model, permissions, and reasoning approach.
-
-Run Codex on a refactor while Gemini reviews your diff. Spawn a cheap Claude haiku sub-agent for a quick analysis while you continue working. Cross-check a decision by asking three different models and comparing the answers. All from a single session, without polluting your context.
-
-The skills handle the hard parts: permission confirmation, shell safety, background execution, structured output parsing, and result summarization. You just describe the task.
-
----
+Skills for **Claude Code**, **Codex**, **Gemini**, and **opencode** that let one AI delegate tasks to others — running in parallel, each in their own context window.
 
 ## Why
-
-Large tasks don't belong in a single context window. Delegating to a sub-agent means:
 
 - **Specialized capabilities** — agents excel at different things. Gemini has built-in web search and can crawl the web natively. Minimax M2.7 (via opencode) is highly capable and extremely cost-effective. Use the right tool for each job.
 - **Different thinking strategies** — each agent reasons differently; running the same problem through multiple models surfaces blind spots and produces better decisions than any single agent would alone
